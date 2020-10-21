@@ -34,6 +34,138 @@ algorithm stable_matching is
 
 //CODE: 
 
+#include<iostream>
+#include<vector>
+#include<stack>
+#include<unordered_map>
+#include<unordered_set>
+
+using namespace std;
+
+int compare(int existing, int newman, unordered_map<int, int> list)
+{
+
+    if (list[existing] < list[newman])
+    {
+        return existing;
+    }
+
+    return newman;
+
+}
+
+unordered_map<int, int>gale_shaple(unordered_map<int, stack<int>>& malepref, unordered_map<int, unordered_map<int,int>>& femalepref)
+{
+    unordered_set<int> menmap;
+    unordered_map<int, bool> femalemap;
+    unordered_map<int, int> match;
+
+    for (auto j = femalepref.begin(); j != femalepref.end(); j++)
+    {
+        femalemap[j->first] = false;
+    }
+
+    while (malepref.empty()==false)
+    {
+
+
+        for (auto i = malepref.begin(); i != malepref.end(); i++)
+        {
+            if (i->second.empty())
+            {
+                //cout << "empty" << i->first << endl;
+                menmap.erase(i->first);
+                malepref.erase(i->first);
+                break;
+            }
+            int topfemale = i->second.top();
+            //cout << i->first << " ++ " << topfemale << " ++" << endl;
+            if (!femalemap[topfemale])
+            {
+                i->second.pop();
+                match[topfemale] = i->first;
+                femalemap[topfemale] = true;
+            }
+            else
+            {
+
+                match[topfemale] = compare(i->first, match[topfemale], femalepref[topfemale]);
+                i->second.pop();
+
+            }
+        }
+    }
+    return match;
+
+}
+
+int main()
+
+{
+    //cout << "ENTER NO OF TESTCASES" << endl;
+    int t;
+    cin >> t;
+    while (t--)
+    {
+       // cout << "Enter the number of man" << endl;
+        int no_man;
+        cin >> no_man;
+
+        unordered_map<int,stack<int>> malepref;
+
+        while (no_man--)
+        {
+         //   cout << "Enter male no:" << endl;
+            int male_no;
+            cin >> male_no;
+
+           // cout << "Enter no of entry" << endl;
+            int noofpref;
+            cin >> noofpref;
+
+            while (noofpref--)
+            {
+                int temp;
+                cin >> temp;
+                malepref[male_no].push(temp);
+
+            }
+        }
+        //cout << "Enter no of Female" << endl;
+        int no_female;
+        cin >> no_female;
+
+        unordered_map<int, unordered_map<int,int>> femalepref;
+
+        while (no_female--)
+        {
+          //  cout << "The nth number of female" << endl;
+            int female_no;
+            cin >> female_no;
+            //cout << "Enter the no of pref" << endl;
+            int noompref;
+            cin >> noompref;
+            int i = 1;
+            while (noompref--)
+            {
+                int temp;
+                cin >> temp;
+                femalepref[female_no][temp]=i;
+                i++;
+
+            }
+        }
+        auto ans = gale_shaple(malepref, femalepref);
+
+        for (auto i = ans.begin(); i != ans.end(); i++)
+        {
+            cout << i->second << " " << i->first << endl;
+        }
+    }
+
+}
+
+
 
 
 
